@@ -3,111 +3,54 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
 
-void main() => runApp(MyApp());
+import 'package:flame/flame.dart';
+import 'package:flame/game.dart';
+import 'package:flame/components.dart';
+
+void main() => runApp(
+  GameWidget(
+    game: GameClass()
+  )
+);
 
 class MyApp extends StatelessWidget {
+
+  final game = MyGame();
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Startup Name Generator',
-      theme: ThemeData(
-        primaryColor: Colors.white
-      ),
-      home: RandomWords()
+    return GameWidget(
+      game: game,
     );
   }
 }
 
-class RandomWords extends StatefulWidget {
+class GameClass extends Game {
+
   @override
-  _RandomWordsState createState() => _RandomWordsState();
+  void render(Canvas canvas) {}
+
+  @override
+  void update(double t) {}
 }
 
-class _RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _saved       = Set<WordPair>();
-  final _biggerFont  = TextStyle(fontSize: 18.0);
+class MyCrate extends SpriteComponent {
 
-  void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          final titles = _saved.map(
-            (WordPair pair) {
-              return ListTile(
-                title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
-                ),
-              );
-            },
-          );
-
-          final divided = ListTile.divideTiles(
-            context: context,
-            tiles: titles,
-          ).toList();
-
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Saved Suggestions'),
-            ),
-            body: ListView(children: divided,),
-          );
-        },
-      ),
-    );
-  }
+  MyCrate(): super.fromSprite(
+    Vector2(16.0, 16.0),
+    new Sprite(Flame.images.fromCache('crate.png'))
+  );
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Startup Name Generator'),
-        actions: [
-          IconButton(icon: Icon(Icons.list), onPressed: _pushSaved)
-        ],
-      ),
-      body: _buildSuggestions(),
-    );
+  void onGameResize(Vector2 gameSize) {
+    this.x = (gameSize.x - this.width) / 2;
+    this.y = (gameSize.y - this.height) / 2;
   }
+}
 
-  Widget _buildSuggestions() {
-    return ListView.builder(
-      padding:     EdgeInsets.all(16.0),
-      itemBuilder: (context, i) {
-        if (i.isOdd) return Divider();
-        final index = i ~/ 2;
-        if (index >= _suggestions.length) {
-          _suggestions.addAll(generateWordPairs().take(10));
-        }
-        return _buildRow(_suggestions[index]);
-      }
-    );
-  }
-
-  Widget _buildRow(WordPair pair) {
-    final alreadySaved = _saved.contains(pair);
-    return ListTile(
-      title: Text(
-        pair.asPascalCase,
-        style: _biggerFont,
-      ),
-      trailing: Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null,
-      ),
-      onTap: () {
-        setState(() {
-          if (alreadySaved) {
-            _saved.remove(pair);
-          } else {
-            _saved.add(pair);
-          }
-        });
-      },
-    );
+class MyGame extends BaseGame {
+  MyGame() {
+    add(new MyCrate());
   }
 }
