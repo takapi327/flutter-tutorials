@@ -7,21 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/services.dart';
 
-void main() => runApp(
-  GameWidget(
-    game: GameClass()
-  )
-);
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
 
+  final image = Flame.images.load('map.png');
   final game = MyGame();
+
+  Widget pauseMenuBuilder(BuildContext context, MyGame game) {
+    return Text("A pause menu");
+  }
 
   @override
   Widget build(BuildContext context) {
     return GameWidget(
       game: game,
+      overlayBuilderMap: {
+        'PauseMenu': pauseMenuBuilder,
+      },
     );
   }
 }
@@ -37,9 +42,11 @@ class GameClass extends Game {
 
 class MyCrate extends SpriteComponent {
 
+  final image = Image(image: AssetImage('assets/map.png'));
+
   MyCrate(): super.fromSprite(
     Vector2(16.0, 16.0),
-    new Sprite(Flame.images.fromCache('crate.png'))
+    new Sprite()
   );
 
   @override
