@@ -75,7 +75,7 @@ class Page1 extends StatelessWidget {
   }
 
   Widget buttonSection(BuildContext context) {
-    final Color color = Theme.of(context).primaryColor;
+    final Color color = Theme.of(context).accentColor;
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

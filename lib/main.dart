@@ -12,7 +12,24 @@ import './page5.dart';
 void main() => runApp(
   MaterialApp(
     debugShowCheckedModeBanner: false,
+    theme: ThemeData(
+      primaryColor: Colors.white
+    ),
     home: MyApp(),
+    onGenerateRoute: (settings) {
+      if (settings.name == '/') {
+        return MaterialPageRoute(builder: (context) => Page1());
+      }
+
+      var uri = Uri.parse(settings.name);
+      if (uri.pathSegments.length == 2 &&
+          uri.pathSegments.first == 'test') {
+        var id = uri.pathSegments[1];
+        return MaterialPageRoute(builder: (context) => NavigatorTest(id: id));
+      }
+
+      return MaterialPageRoute(builder: (context) => UnknownScreen());
+    },
   )
 );
 
@@ -56,28 +73,5 @@ class MyApp extends StatelessWidget {
         ),
       )
     );
-    /*
-    return MaterialApp(
-      title: 'Flutter layout demo',
-      theme: ThemeData(
-        primaryColor: Colors.white
-      ),
-      //home: Home(),
-      onGenerateRoute: (settings) {
-        if (settings.name == '/') {
-          return MaterialPageRoute(builder: (context) => Page1());
-        }
-
-        var uri = Uri.parse(settings.name);
-        if (uri.pathSegments.length == 2 &&
-            uri.pathSegments.first == 'test') {
-          var id = uri.pathSegments[1];
-          return MaterialPageRoute(builder: (context) => NavigatorTest(id: id));
-        }
-        
-        return MaterialPageRoute(builder: (context) => UnknownScreen());
-      },
-    );
-     */
   }
 }
