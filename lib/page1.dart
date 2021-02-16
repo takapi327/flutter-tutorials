@@ -7,26 +7,20 @@ class Page1 extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: Column(
+          child: ListView(
             children: [
-              Expanded(
-                child: ListView(
-                  children: [
-                    Image.asset(
-                      'assets/images/map.png',
-                      width:  600,
-                      height: 140,
-                      fit:    BoxFit.fitWidth,
-                    ),
-                    titleSection(),
-                    buttonSection(context),
-                    textSection(),
-                    navigateButton(context)
-                  ],
-                ),
-              )
+              Image.asset(
+                'assets/images/map.png',
+                width:  600,
+                height: 140,
+                fit:    BoxFit.fitWidth,
+              ),
+              titleSection(),
+              buttonSection(context),
+              textSection(),
+              navigateButton(context)
             ],
-          )
+          ),
         ),
       ]
     );
