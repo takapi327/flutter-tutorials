@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import './page1.dart';
 import './page2.dart';
 import './page3.dart';
@@ -13,24 +14,22 @@ void main() => runApp(
   MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
-      primaryColor: Colors.white
+        primaryColor: Colors.white
     ),
     home: MyApp(),
     onGenerateRoute: (settings) {
       if (settings.name == '/') {
         return MaterialPageRoute(builder: (context) => Page1());
       }
-
       var uri = Uri.parse(settings.name);
       if (uri.pathSegments.length == 2 &&
           uri.pathSegments.first == 'test') {
         var id = uri.pathSegments[1];
         return MaterialPageRoute(builder: (context) => NavigatorTest(id: id));
       }
-
       return MaterialPageRoute(builder: (context) => UnknownScreen());
     },
-  )
+  ),
 );
 
 class TabInfo {
@@ -53,24 +52,27 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: _tabs.length,
-      child:  Scaffold(
-        appBar: AppBar(
-          title: Text('Flutter layout demo'),
-          bottom: PreferredSize(
-            child: TabBar(
-              isScrollable: true,
-              tabs: _tabs.map((TabInfo tab) {
-                return Tab(text: tab.label);
-              }).toList(),
+      child: ChangeNotifierProvider(
+        create: (context) => CartModel(),
+        child:  Scaffold(
+          appBar: AppBar(
+            title: Text('Flutter layout demo'),
+            bottom: PreferredSize(
+              child: TabBar(
+                isScrollable: true,
+                tabs: _tabs.map((TabInfo tab) {
+                  return Tab(text: tab.label);
+                }).toList(),
+              ),
+              preferredSize: Size.fromHeight(30.0),
             ),
-            preferredSize: Size.fromHeight(30.0),
           ),
-        ),
-        body: TabBarView(
-          children: _tabs.map(
-            (tab) => tab.widget
-          ).toList()
-        ),
+          body: TabBarView(
+            children: _tabs.map(
+              (tab) => tab.widget
+            ).toList()
+          ),
+        )
       )
     );
   }
