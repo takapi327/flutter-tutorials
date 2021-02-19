@@ -3,111 +3,77 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
+import 'package:provider/provider.dart';
+import './page1.dart';
+import './page2.dart';
+import './page3.dart';
+import './page4.dart';
+import './page5.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(
+  MaterialApp(
+    debugShowCheckedModeBanner: false,
+    theme: ThemeData(
+        primaryColor: Colors.white
+    ),
+    home: MyApp(),
+    onGenerateRoute: (settings) {
+      if (settings.name == '/') {
+        return MaterialPageRoute(builder: (context) => Page1());
+      }
+      var uri = Uri.parse(settings.name);
+      if (uri.pathSegments.length == 2 &&
+          uri.pathSegments.first == 'test') {
+        var id = uri.pathSegments[1];
+        return MaterialPageRoute(builder: (context) => NavigatorTest(id: id));
+      }
+      return MaterialPageRoute(builder: (context) => UnknownScreen());
+    },
+  ),
+);
+
+class TabInfo {
+  String label;
+  Widget widget;
+  TabInfo(this.label, this.widget);
+}
 
 class MyApp extends StatelessWidget {
+
+  final List<TabInfo> _tabs = [
+    TabInfo('page1', Page1()),
+    TabInfo('page2', Page2()),
+    TabInfo('page3', Page3()),
+    TabInfo('page4', Page4()),
+    TabInfo('page5', Page5())
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Startup Name Generator',
-      theme: ThemeData(
-        primaryColor: Colors.white
-      ),
-      home: RandomWords()
-    );
-  }
-}
-
-class RandomWords extends StatefulWidget {
-  @override
-  _RandomWordsState createState() => _RandomWordsState();
-}
-
-class _RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _saved       = Set<WordPair>();
-  final _biggerFont  = TextStyle(fontSize: 18.0);
-
-  void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          final titles = _saved.map(
-            (WordPair pair) {
-              return ListTile(
-                title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
-                ),
-              );
-            },
-          );
-
-          final divided = ListTile.divideTiles(
-            context: context,
-            tiles: titles,
-          ).toList();
-
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Saved Suggestions'),
+    return DefaultTabController(
+      length: _tabs.length,
+      child: ChangeNotifierProvider(
+        create: (context) => CartModel(),
+        child:  Scaffold(
+          appBar: AppBar(
+            title: Text('Flutter layout demo'),
+            bottom: PreferredSize(
+              child: TabBar(
+                isScrollable: true,
+                tabs: _tabs.map((TabInfo tab) {
+                  return Tab(text: tab.label);
+                }).toList(),
+              ),
+              preferredSize: Size.fromHeight(30.0),
             ),
-            body: ListView(children: divided,),
-          );
-        },
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Startup Name Generator'),
-        actions: [
-          IconButton(icon: Icon(Icons.list), onPressed: _pushSaved)
-        ],
-      ),
-      body: _buildSuggestions(),
-    );
-  }
-
-  Widget _buildSuggestions() {
-    return ListView.builder(
-      padding:     EdgeInsets.all(16.0),
-      itemBuilder: (context, i) {
-        if (i.isOdd) return Divider();
-        final index = i ~/ 2;
-        if (index >= _suggestions.length) {
-          _suggestions.addAll(generateWordPairs().take(10));
-        }
-        return _buildRow(_suggestions[index]);
-      }
-    );
-  }
-
-  Widget _buildRow(WordPair pair) {
-    final alreadySaved = _saved.contains(pair);
-    return ListTile(
-      title: Text(
-        pair.asPascalCase,
-        style: _biggerFont,
-      ),
-      trailing: Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null,
-      ),
-      onTap: () {
-        setState(() {
-          if (alreadySaved) {
-            _saved.remove(pair);
-          } else {
-            _saved.add(pair);
-          }
-        });
-      },
+          ),
+          body: TabBarView(
+            children: _tabs.map(
+              (tab) => tab.widget
+            ).toList()
+          ),
+        )
+      )
     );
   }
 }
